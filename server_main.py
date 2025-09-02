@@ -23,6 +23,12 @@ if __name__ == "__main__":
     # 코랩은 외부 포트 접근이 어려워 STDIO 권장
     USE_HTTP = True  # ← 코랩에서는 False
     if USE_HTTP:
-        app.run_http(host="0.0.0.0", port=8765)
+        if hasattr(app, "run_http"):
+            app.run_http(host="0.0.0.0", port=8765)
+        else:
+            app.run(host="0.0.0.0", port=8765)
     else:
-        app.run_stdio()
+        if hasattr(app, "run_stdio"):
+            app.run_stdio()
+        else:
+            app.run()

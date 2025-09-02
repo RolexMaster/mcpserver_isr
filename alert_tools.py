@@ -3,7 +3,7 @@ from pydantic import BaseModel, Field
 from server_main import app
 
 class AlertRaiseParams(BaseModel):
-    level: str = Field(..., regex=r"^(info|warning|critical)$")
+    level: str = Field(..., pattern=r"^(info|warning|critical)$")
     message: str
     zone_id: str | None = None
     target_id: str | None = None

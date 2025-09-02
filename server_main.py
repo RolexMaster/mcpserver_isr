@@ -1,34 +1,46 @@
 # server_main.py
+import os
+import sys
 from fastmcp import FastMCP
 
-# 호환 래퍼: 최신 fastmcp(name=...) / 구버전(app_name=...)
 def create_app():
     try:
         return FastMCP(name="coastal-ptz-controller", version="1.0.0")
     except TypeError:
-        # 구버전 fastmcp 대응
         return FastMCP(app_name="coastal-ptz-controller", version="1.0.0")
 
-# Single MCP app (all tools register on this instance)
 app = create_app()
 
-# Import tool modules (registration happens via decorators)
-import target_tools
-import zone_tools
-import eots_tools
-import alert_tools
-import system_tools
+# 도구 모듈 등록(데코레이터)
+import target_tools  # noqa: F401
+import zone_tools    # noqa: F401
+import eots_tools    # noqa: F401
+import alert_tools   # noqa: F401
+import system_tools  # noqa: F401
 
 if __name__ == "__main__":
-    # 코랩은 외부 포트 접근이 어려워 STDIO 권장
-    USE_HTTP = True  # ← 코랩에서는 False
-    if USE_HTTP:
-        if hasattr(app, "run_http"):
-            app.run_http(host="0.0.0.0", port=8765)
-        else:
-            app.run(host="0.0.0.0", port=8765)
+    HOST = os.getenv("HOST", "0.0.0.0")
+    PORT = int(os.getenv("PORT", "8000"))
+
+    # 1) 공식 HTTP 러너가 있으면 그걸로
+    try:
+        app.run_http(host=HOST, port=PORT)
+        sys.exit(0)
+    except Exception:
+        pass
+
+    # 2) run(transport="http") 지원 버전
+    try:
+        app.run(transport="http", host=HOST, port=PORT)
+        sys.exit(0)
+    except Exception:
+        pass
+
+    # 3) ASGI 노출되어 있으면 uvicorn으로
+    asgi = getattr(app, "asgi", None) or getattr(app, "app", None) or getattr(app, "asgi_app", None)
+    if asgi is not None:
+        import uvicorn
+        uvicorn.run(asgi, host=HOST, port=PORT)
     else:
-        if hasattr(app, "run_stdio"):
-            app.run_stdio()
-        else:
-            app.run()
+        # 4) 최후 수단: STDIO (포트 사용 안 함)
+        app.run()

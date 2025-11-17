@@ -46,13 +46,13 @@ def _km(a_lat,a_lon,b_lat,b_lon):
     ky = 111
     return sqrt(((a_lon-b_lon)*kx)**2 + ((a_lat-b_lat)*ky)**2)
 
-@app.tool(name="target.query_nearest", description="Find nearest targets within radius")
-def target_query_nearest(params: TargetQueryNearestParams):
-    items = []
-    for t in _TARGETS.values():
-        d = _km(params.lat, params.lon, t["lat"], t["lon"])
-        if d <= params.radius_km:
-            items.append({"target_id": t["target_id"], "cls": t["cls"], "km": round(d,2),
-                          "speed_kn": t["speed_kn"], "heading_deg": t["heading_deg"]})
-    items.sort(key=lambda x: x["km"])
-    return {"ok": True, "count": len(items[:params.limit]), "results": items[:params.limit]}
+# @app.tool(name="target.query_nearest", description="Find nearest targets within radius")
+# def target_query_nearest(params: TargetQueryNearestParams):
+#     items = []
+#     for t in _TARGETS.values():
+#         d = _km(params.lat, params.lon, t["lat"], t["lon"])
+#         if d <= params.radius_km:
+#             items.append({"target_id": t["target_id"], "cls": t["cls"], "km": round(d,2),
+#                           "speed_kn": t["speed_kn"], "heading_deg": t["heading_deg"]})
+#     items.sort(key=lambda x: x["km"])
+#     return {"ok": True, "count": len(items[:params.limit]), "results": items[:params.limit]}

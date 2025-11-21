@@ -2,8 +2,7 @@
 FastMCP 2.12.0 / Streamable-HTTP 서버 엔트리포인트
 - 서버명: coastal-ptz-controller
 - 엔드포인트: /mcp
-- alert_tools / eots_tools / target_tools / system_tools / zone_tools 의
-  @app.tool 데코레이터가 'server_main.app' 를 참조하는 구조를 지원합니다.
+- eots_tools_core 의 @app.tool 데코레이터가 'server_main.app' 를 참조하는 구조를 지원합니다.
 """
 
 from __future__ import annotations
@@ -53,24 +52,26 @@ logger = logging.getLogger("server_main")
 
 
 # -----------------------------------------------------------------------------
-# 툴 모듈 import (사이드이펙트 등록 방식과 register(app) 방식 모두 지원)
-# - 각 파일 안에서 @app.tool(...) 데코레이터가 실행되어야 MCP에 노출됩니다.
-# - 만약 각 모듈이 register(app)를 제공한다면, 아래에서 호출해도 됩니다(중복 등록 주의).
+# 툴 모듈 import
+# - eots_tools_core 만 사용
 # -----------------------------------------------------------------------------
-import alert_tools  # noqa: F401
-import eots_tools   # noqa: F401
-import target_tools # noqa: F401
-import system_tools # noqa: F401
-import zone_tools   # noqa: F401
+import eots_tools_core  # noqa: F401
 
-# 선택: register(app) 패턴을 병행 지원하고 싶다면 아래 주석 해제 (모듈이 지원할 때만)
-for _mod in (alert_tools, eots_tools, target_tools, system_tools, zone_tools):
-    if hasattr(_mod, "register") and callable(getattr(_mod, "register")):
-        try:
-            _mod.register(app)  # 필요 시만 사용 (중복 등록에 주의)
-            logger.info("Registered tools via %s.register(app)", _mod.__name__)
-        except Exception as ex:
-            logger.warning("register(app) 호출 중 경고: %s: %s", _mod.__name__, ex)
+# 예전 구조 (여러 모듈 사용)는 전부 주석 처리
+# import alert_tools  # noqa: F401
+# import eots_tools   # noqa: F401
+# import target_tools # noqa: F401
+# import system_tools # noqa: F401
+# import zone_tools   # noqa: F401
+
+# register(app) 패턴도 현재는 사용하지 않음
+# for _mod in (alert_tools, eots_tools, target_tools, system_tools, zone_tools):
+#     if hasattr(_mod, "register") and callable(getattr(_mod, "register")):
+#         try:
+#             _mod.register(app)  # 필요 시만 사용 (중복 등록에 주의)
+#             logger.info("Registered tools via %s.register(app)", _mod.__name__)
+#         except Exception as ex:
+#             logger.warning("register(app) 호출 중 경고: %s: %s", _mod.__name__, ex)
 
 
 # -----------------------------------------------------------------------------

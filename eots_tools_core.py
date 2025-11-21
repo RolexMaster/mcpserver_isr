@@ -234,7 +234,12 @@ def eots_power(
 
 @app.tool(
     name="eots.lrf_fire",
-    description="Fire LRF once to measure distance and target position.",
+    description=(
+        "[LRF] Fire the laser range finder ONCE to measure distance and target coordinates "
+        "for the object currently under the crosshair. "
+        "Use this when the user asks to show or update the current target distance/position, "
+        "e.g. 'Show target position', 'Measure the current target', 'Give me the range to the target'."
+    ),
 )
 def eots_lrf_fire():
     """
